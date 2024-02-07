@@ -157,6 +157,7 @@ const TicketsList = ({
   status,
   searchParam,
   tags,
+  chatbot,
   showAll,
   selectedQueueIds,
 }) => {
@@ -168,13 +169,14 @@ const TicketsList = ({
   useEffect(() => {
     dispatch({ type: "RESET" });
     setPageNumber(1);
-  }, [status, searchParam, dispatch, showAll, selectedQueueIds]);
+  }, [status, chatbot, searchParam, dispatch, showAll, selectedQueueIds]);
 
   const { tickets, hasMore, loading } = useTickets({
     pageNumber,
     searchParam,
     tags: JSON.stringify(tags),
     status,
+    chatbot,
     showAll,
     queueIds: JSON.stringify(selectedQueueIds),
   });
@@ -185,7 +187,7 @@ const TicketsList = ({
       type: "LOAD_TICKETS",
       payload: tickets,
     });
-  }, [tickets, status, searchParam]);
+  }, [tickets, status, chatbot, searchParam]);
 
   useEffect(() => {
     const companyId = localStorage.getItem("companyId");

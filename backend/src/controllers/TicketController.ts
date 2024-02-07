@@ -20,6 +20,7 @@ type IndexQuery = {
   withUnreadMessages: string;
   queueIds: string;
   tags: string;
+  chatbot?: boolean | string;
   users: string;
 };
 
@@ -38,6 +39,7 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     updatedAt,
     searchParam,
     showAll,
+    chatbot,
     queueIds: queueIdsStringified,
     tags: tagIdsStringified,
     users: userIdsStringified,
@@ -76,9 +78,10 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     queueIds,
     withUnreadMessages,
     companyId,
-
-
+    chatbot,
   });
+  console.log('desculpa pelo teste');
+  console.log(tickets)
   return res.status(200).json({ tickets, count, hasMore });
 };
 
@@ -149,7 +152,6 @@ export const kanban = async (req: Request, res: Response): Promise<Response> => 
     queueIds,
     withUnreadMessages,
     companyId
-
   });
 
   return res.status(200).json({ tickets, count, hasMore });

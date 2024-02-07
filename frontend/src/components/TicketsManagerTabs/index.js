@@ -343,20 +343,40 @@ const TicketsManagerTabs = () => {
             }
             value={"pending"}
           />
+                    <Tab
+            label={
+              <Badge
+                className={classes.badge}
+                badgeContent={pendingCount}
+                color="secondary"
+              >
+                {i18n.t("automacao")}
+              </Badge>
+            }
+            value={"chatbot"}
+          />
         </Tabs>
         <Paper className={classes.ticketsWrapper}>
           <TicketsList
             status="open"
             showAll={showAllTickets}
             selectedQueueIds={selectedQueueIds}
-            updateCount={(val) => setOpenCount(val)}
+            updateCount={(val) => setOpenCount(val)}/// AQUI TAMBEM
             style={applyPanelStyle("open")}
           />
           <TicketsList
+            chatbot={false}
             status="pending"
             selectedQueueIds={selectedQueueIds}
             updateCount={(val) => setPendingCount(val)}
             style={applyPanelStyle("pending")}
+          />
+          <TicketsList
+            chatbot={true}
+            status="pending"
+            selectedQueueIds={selectedQueueIds}
+            updateCount={(val) => setPendingCount(val)}
+            style={applyPanelStyle("chatbot")}
           />
         </Paper>
       </TabPanel>

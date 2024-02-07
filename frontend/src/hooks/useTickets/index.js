@@ -3,12 +3,13 @@ import toastError from "../../errors/toastError";
 
 import api from "../../services/api";
 
-const useTickets = ({
+const useTickets = ({//// AQUI é BEM PRINCIPAL
   searchParam,
   tags,
   users,
   pageNumber,
   status,
+  chatbot,
   date,
   updatedAt,
   showAll,
@@ -32,6 +33,7 @@ const useTickets = ({
               users,
               status,
               date,
+              chatbot,
               updatedAt,
               showAll,
               queueIds,

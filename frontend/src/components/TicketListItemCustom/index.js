@@ -261,7 +261,7 @@ const useStyles = makeStyles((theme) => ({
     const handleAcepptTicket = async (id) => {
         setLoading(true);
         try {
-            await api.put(`/tickets/${id}`, {
+            await api.put(`/tickets/${id}`, {// AQUI TAMBEM
                 status: "open",
                 userId: user?.id,
             });

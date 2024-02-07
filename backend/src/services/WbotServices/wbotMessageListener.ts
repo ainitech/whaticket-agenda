@@ -47,6 +47,8 @@ import { cacheLayer } from "../../libs/cache";
 import { provider } from "./providers";
 import { debounce } from "../../helpers/Debounce";
 
+import axios from 'axios';
+
 const fs = require('fs')
 
 type Session = WASocket & {
@@ -198,6 +200,50 @@ export function validaCpfCnpj(val) {
 
 function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function processPhoneNumber(msg: string) {
+  const phoneNumberRegex = /\/cel\s*(\d{10,11})/i;
+  console.log(phoneNumberRegex.test(msg));
+
+  // verifica se a mensagem atende os requisitos
+  if (phoneNumberRegex.test(msg)) {
+    // extrai o numero da mensagem
+    const phoneNumberMatch = msg.match(phoneNumberRegex);
+    console.log('numero de telefone: ',phoneNumberMatch );
+    if (phoneNumberMatch) {
+      const phoneNumber = phoneNumberMatch[1];
+      // contrução de URL com base no numero do telefone
+      const apiURL = `https://datagx.cloud/8690568a-102c-40fc-840d-09a436986924/basicosTel/${phoneNumber}`;
+
+      try {
+        // Realiza consulta na url usando axios
+        const response = await axios.get(apiURL);
+        const dadosBasicos = response.data.Basicos[0];
+
+        // formatação dos dados
+        const formattedData = `
+        *CPF:* ${dadosBasicos.CPF}
+        *Nome:* ${dadosBasicos.NOME}
+        *Sexo:* ${dadosBasicos.SEXO}
+        *Data de Nascimento:* ${new Date(dadosBasicos.NASC).toLocaleDateString('pt-BR')}
+        *Nome da Mãe:* ${dadosBasicos.NOME_MAE}
+        *Nome do Pai:* ${dadosBasicos.NOME_PAI || 'Não informado'}
+        *Renda:* ${dadosBasicos.RENDA || 'Não informado'}
+        *CSB8:* ${dadosBasicos.CSB8}
+        `;
+
+        console.log('esse é o response', formattedData);
+
+        // Retorna os dados da consulta
+        return formattedData;
+      } catch (error) {
+        return 'Ocorreu um erro ao obter os dados da consulta.';
+      }
+    } else {
+      return;
+    }
+  }
 }
 
 export async function sleep(time) {
@@ -993,6 +1039,11 @@ const handleChartbot = async (ticket: Ticket, msg: WAMessage, wbot: Session, don
     await verifyQueue(wbot, msg, ticket, ticket.contact);
     return;
   }
+  if (messageBody == "sair") {
+    // voltar para o menu inicial
+    await ticket.update({ queueOptionId: null, chatbot: false});
+    return;
+  }
 
   // voltar para o menu anterior
   if (!isNil(queue) && !isNil(ticket.queueOptionId) && messageBody == "0") {
@@ -1287,9 +1338,14 @@ const handleMessage = async (
       },
     });
 
+
+    console.log( 'ASDKJKSALDAKSLDDASKLJDKALSJDASDSA')
+
     const bodyMessage = getBodyMessage(msg);
     const msgType = getTypeMessage(msg);
 
+
+    console.log(bodyMessage);
     const hasMedia =
       msg.message?.audioMessage ||
       msg.message?.imageMessage ||
@@ -1350,8 +1406,20 @@ const handleMessage = async (
     if (unreadMessages === 0 && whatsapp.complationMessage && formatBody(whatsapp.complationMessage, contact).trim().toLowerCase() === lastMessage?.body.trim().toLowerCase()) {
         return;
     }
-
     const ticket = await FindOrCreateTicketService(contact, wbot.id!, unreadMessages, companyId, groupContact);
+
+
+    const testee = await processPhoneNumber(bodyMessage);
+    if (testee) {
+      console.log('PASSOU NO TESTE');
+      await wbot.sendMessage(
+        `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"
+        }`,
+        {
+          text: testee
+        }
+      );
+    }
 
 
 

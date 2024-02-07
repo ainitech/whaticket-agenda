@@ -25,6 +25,7 @@ interface Request {
   tags: number[];
   users: number[];
   companyId: number;
+  chatbot?: boolean | string;
 }
 
 interface Response {
@@ -41,6 +42,7 @@ const ListTicketsService = async ({
   users,
   status,
   date,
+  chatbot,
   updatedAt,
   showAll,
   userId,
@@ -89,6 +91,13 @@ const ListTicketsService = async ({
     whereCondition = {
       ...whereCondition,
       status
+    };
+  }
+
+  if (chatbot) {
+    whereCondition = {
+      ...whereCondition,
+      chatbot
     };
   }
 

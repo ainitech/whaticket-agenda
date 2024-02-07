@@ -35,7 +35,7 @@ export const initIO = (httpServer: Server): SocketIO => {
       socket.join("notification");
     });
 
-    socket.on("joinTickets", (status: string) => {
+    socket.on("kets", (status: string) => {
       logger.info(`A client joined to ${status} tickets channel.`);
       socket.join(status);
     });
